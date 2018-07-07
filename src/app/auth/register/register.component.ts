@@ -30,7 +30,7 @@ export class RegisterComponent implements OnInit {
     this.appService.fireLoader();
 
     this.auth.signUp(user.email.value, user.password.value).subscribe((value) => {
-      const userJson = value.toJSON();
+      const userJson = value;
       this.snackService.launch('Registro correcto, iniciando sesión', 'Alta usuario', 5000);
 
       const data = {
@@ -41,16 +41,15 @@ export class RegisterComponent implements OnInit {
         role: 'customer'
       };
 
-      this.afs.collection('users').doc(userJson.uid).set(data)
-        .then(() => {
-          this.appService.stopLoader();
-          this.auth.emailAndPassword(user.email, user.password).then(() => {
-            this.router.navigate(['/shop']);
-          })
-        })
-        .catch(error => {
-          this.appService.stopLoader();
-        })
-    }, error => {  });					
+      this.auth.emailAndPassword(data.email, user.password.value).subscribe((value) => {
+        let response = value;
+        this.appService.stopLoader();
+        if (response)
+          this.router.navigate(['/shop']);
+      }, error => { this.appService.stopLoader(); });      
+    }, error => { this.appService.stopLoader(); });	
+    
+    	
+    
   }
 }

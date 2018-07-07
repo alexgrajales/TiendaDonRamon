@@ -57,13 +57,19 @@ export class AuthService
     return this.oAuthLogin(provider);
   }
 
-  emailAndPassword(email, password){
-    return this.afAuth.auth.signInWithEmailAndPassword(email.value, password.value);
+  emailAndPassword(email, password): Observable<any> {
+    return this._http.post(GLOBALURLS().urlUsuario, {"email":email, "password": password})
+        .map((response: Response) => { 
+          return response.json();
+        });    
+    // return this.afAuth.auth.signInWithEmailAndPassword(email.value, password.value);
   }
 
   signUp(email, password): Observable<any> {
     return this._http.post(GLOBALURLS().urlUsuarios, {"email":email, "password": password})
-        .map((response: Response) => { });    
+        .map((response: Response) => { 
+          return response.json();
+        });    
   }
 
   signOut(){

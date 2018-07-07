@@ -6,8 +6,8 @@ import { AppService } from "@common/app.service";
 
 
 
-export class Auth{
-  constructor(public email: string, public password: string){
+export class Auth {
+  constructor(public email: string, public password: string) {
 
   }
 }
@@ -17,30 +17,34 @@ export class Auth{
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent{
+export class LoginComponent {
 
   constructor(
-    public auth: AuthService, 
-    public router: Router, 
-    private snackService: SnackService, 
+    public auth: AuthService,
+    public router: Router,
+    private snackService: SnackService,
     public appService: AppService) { }
 
   ngOnInit() {
   }
 
-  login(user: Auth){
+  login(user) {
     this.appService.fireLoader();
-    this.auth.emailAndPassword(user.email, user.password).then(credentials =>{
+    this.auth.emailAndPassword(user.email.value, user.password.value).subscribe((value) => {
+      let response = value;
+      this.appService.stopLoader();
+      if (response) {
+        this.router.navigate(['/shop']);
+        this.appService.stopLoader();
+      }
+
+    }, error => {
       this.router.navigate(['/shop']).then(() => {
         this.appService.stopLoader();
       }).catch(err => {
-      this.snackService.launch("Error: " + err.message, "LA ruta no existe", 5000);
-      this.appService.stopLoader();
-      })
-    })
-    .catch(err => {
-      this.snackService.launch("Error: " + err.message, "Inicio de sesión", 5000);
-      this.appService.stopLoader();
-      })
-  }  
+        this.snackService.launch("Error: " + err.message, "LA ruta no existe", 5000);
+        this.appService.stopLoader();
+      });
+    });
+  }
 }
